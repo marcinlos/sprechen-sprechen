@@ -23,7 +23,7 @@ public class Parser {
         parsers.put(Type.RECV_MSG, TextMessage.getParser());
     }
 
-    public static Payload parseMessage(Type type, ByteBuffer buffer)
+    public static Message parseMessage(Type type, ByteBuffer buffer)
             throws InvalidFormatException {
         PayloadParser parser = parsers.get(type);
         if (parser != null) {

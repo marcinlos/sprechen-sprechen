@@ -2,13 +2,13 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class EmptyMessage implements Payload {
+public class EmptyMessage implements Message {
 
     public static final EmptyMessage INSTANCE = new EmptyMessage();
 
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) {
+        public Message parse(ByteBuffer buffer) {
             return new EmptyMessage();
         }
     };

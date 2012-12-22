@@ -2,7 +2,7 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class StatusMessage implements Payload {
+public class StatusMessage implements Message {
 
     private String username;
     private Status status;
@@ -18,7 +18,7 @@ public class StatusMessage implements Payload {
     
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) throws InvalidFormatException {
+        public Message parse(ByteBuffer buffer) throws InvalidFormatException {
             Status status = Status.fromByte(buffer.get());
             int nameSize = buffer.getInt();
             int descSize = buffer.getInt();

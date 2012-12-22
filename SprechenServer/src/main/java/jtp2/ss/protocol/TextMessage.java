@@ -3,7 +3,7 @@ package jtp2.ss.protocol;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-public class TextMessage implements Payload {
+public class TextMessage implements Message {
     
     private String sender;
     private String recipient;
@@ -22,7 +22,7 @@ public class TextMessage implements Payload {
     
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) {
+        public Message parse(ByteBuffer buffer) {
             long timestamp = buffer.getLong();
             Date date = new Date(timestamp);
             int senderSize = buffer.getInt();

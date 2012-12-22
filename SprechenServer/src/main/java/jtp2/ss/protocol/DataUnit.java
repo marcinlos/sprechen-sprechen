@@ -5,9 +5,9 @@ import java.nio.ByteBuffer;
 public class DataUnit {
 
     private Header header;
-    private Payload payload;
+    private Message payload;
 
-    public DataUnit(Type type, Payload payload) {
+    public DataUnit(Type type, Message payload) {
         this.header = new Header(type, payload.length());
         this.payload = payload;
     }
@@ -15,7 +15,7 @@ public class DataUnit {
     public static DataUnit fromBytes(ByteBuffer buffer)
             throws InvalidFormatException {
         Header header = Header.fromBytes(buffer);
-        Payload payload = Parser.parseMessage(header.getType(), buffer);
+        Message payload = Parser.parseMessage(header.getType(), buffer);
         DataUnit data = new DataUnit(header.getType(), payload);
         return data;
     }
@@ -24,7 +24,7 @@ public class DataUnit {
         return header;
     }
 
-    public Payload getPayload() {
+    public Message getPayload() {
         return payload;
     }
 

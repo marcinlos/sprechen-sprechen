@@ -2,7 +2,7 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class RegisterMessage implements Payload {
+public class RegisterMessage implements Message {
 
     private String login;
     private long passwordHash;
@@ -16,7 +16,7 @@ public class RegisterMessage implements Payload {
 
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) {
+        public Message parse(ByteBuffer buffer) {
             long hash = buffer.getLong();
             int length = buffer.getInt();
             byte[] loginBytes = new byte[length];

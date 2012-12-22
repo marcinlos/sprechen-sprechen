@@ -2,7 +2,7 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class StringMessage implements Payload {
+public class StringMessage implements Message {
 
     private String message;
 
@@ -22,7 +22,7 @@ public class StringMessage implements Payload {
 
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) {
+        public Message parse(ByteBuffer buffer) {
             int length = buffer.getInt();
             byte[] msgBytes = new byte[length];
             buffer.get(msgBytes);

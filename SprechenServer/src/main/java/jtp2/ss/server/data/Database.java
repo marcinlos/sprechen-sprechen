@@ -1,5 +1,6 @@
 package jtp2.ss.server.data;
 
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -8,6 +9,7 @@ public class Database {
 
     private static final SessionFactory sessionFactory = buildSessionFactory();
 
+    @SuppressWarnings("deprecation")
     private static SessionFactory buildSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
@@ -34,7 +36,7 @@ public class Database {
         session.getTransaction().commit();
         session = getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        User u = (User) session.get(User.class, 1L);
+        User u = (User) session.get(User.class, "blah");
         System.out.println("Login: " + u.getLogin());
     }
 }

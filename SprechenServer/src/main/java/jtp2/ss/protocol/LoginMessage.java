@@ -2,7 +2,7 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class LoginMessage implements Payload {
+public class LoginMessage implements Message {
 
     private String login;
     private long passwordHash;
@@ -21,7 +21,7 @@ public class LoginMessage implements Payload {
 
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) throws InvalidFormatException {
+        public Message parse(ByteBuffer buffer) throws InvalidFormatException {
             // | pwd_hash | login_size | desc_size | login ... | desc ... |
             long hash = buffer.getLong();
             int loginSize = buffer.getInt();
