@@ -2,13 +2,11 @@ package jtp2.ss.protocol;
 
 public enum Status {
     NOT_AVAILABLE,
-    NOT_AVAILABLE_DESC,
-    AVAILABLE,
-    AVAILABLE_DESC;
+    AVAILABLE;
 
     private static final Status[] vals = Status.values();
 
-    public static Status fromByte(byte ord) {
+    public static Status fromByte(byte ord) throws InvalidFormatException {
         if (ord < vals.length) {
             return vals[ord];
         } else {

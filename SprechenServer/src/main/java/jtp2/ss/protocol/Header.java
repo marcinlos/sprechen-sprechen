@@ -32,9 +32,11 @@ public class Header {
 
     public void write(ByteBuffer buffer) {
         buffer.put(Type.toByte(type));
+        buffer.putInt(length);
     }
 
-    public static Header fromBytes(ByteBuffer buffer) {
+    public static Header fromBytes(ByteBuffer buffer)
+            throws NoSuchTypeException {
         Type type = Type.fromByte(buffer.get());
         int length = buffer.getInt();
         return new Header(type, length);

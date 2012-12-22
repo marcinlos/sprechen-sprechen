@@ -8,20 +8,32 @@ public class StringMessage implements Payload {
 
     public static final int FIXED_PART_LENGTH = 4;
     
-    public StringMessage(String cause) {
-        this.message = cause;
+    public StringMessage(String message) {
+        this.message = message;
     }
 
-    public static final PayloadParser PARSER = new PayloadParser() {
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    private static final PayloadParser PARSER = new PayloadParser() {
         @Override
         public Payload parse(ByteBuffer buffer) {
             int length = buffer.getInt();
             byte[] msgBytes = new byte[length];
-            buffer.get(msgBytes, 0, length);
+            buffer.get(msgBytes);
             String content = Utils.decode(msgBytes);
             return new StringMessage(content);
         }
     };
+    
+    public static PayloadParser getParser() {
+        return PARSER;
+    }
 
     @Override
     public int length() {

@@ -1,7 +1,7 @@
 package jtp2.ss.protocol;
 
 @SuppressWarnings("serial")
-public class InvalidFormatException extends RuntimeException {
+public class InvalidFormatException extends Exception {
 
     public InvalidFormatException() {
         super();

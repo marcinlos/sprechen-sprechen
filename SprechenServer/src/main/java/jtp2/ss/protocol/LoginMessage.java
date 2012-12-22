@@ -19,9 +19,9 @@ public class LoginMessage implements Payload {
         this.description = description;
     }
 
-    public static final PayloadParser PARSER = new PayloadParser() {
+    private static final PayloadParser PARSER = new PayloadParser() {
         @Override
-        public Payload parse(ByteBuffer buffer) {
+        public Payload parse(ByteBuffer buffer) throws InvalidFormatException {
             // | pwd_hash | login_size | desc_size | login ... | desc ... |
             long hash = buffer.getLong();
             int loginSize = buffer.getInt();
@@ -29,7 +29,7 @@ public class LoginMessage implements Payload {
             Status status = Status.fromByte(buffer.get());
             
             byte[] loginBytes = new byte[loginSize];
-            buffer.get(loginBytes, 0, loginSize);
+            buffer.get(loginBytes);
             String login = Utils.decode(loginBytes);
             
             String desc = null;
@@ -41,6 +41,10 @@ public class LoginMessage implements Payload {
             return new LoginMessage(login, hash, status, desc);
         }
     };
+    
+    public static PayloadParser getParser() {
+        return PARSER;
+    }
 
     @Override
     public int length() {

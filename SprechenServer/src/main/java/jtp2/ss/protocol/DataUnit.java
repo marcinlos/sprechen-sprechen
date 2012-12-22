@@ -12,7 +12,8 @@ public class DataUnit {
         this.payload = payload;
     }
 
-    public static DataUnit fromBytes(ByteBuffer buffer) {
+    public static DataUnit fromBytes(ByteBuffer buffer)
+            throws InvalidFormatException {
         Header header = Header.fromBytes(buffer);
         Payload payload = Parser.parseMessage(header.getType(), buffer);
         DataUnit data = new DataUnit(header.getType(), payload);
@@ -27,15 +28,18 @@ public class DataUnit {
         return payload;
     }
 
-    public void writeToBuffer(ByteBuffer buffer) {
+    public void write(ByteBuffer buffer) {
         header.write(buffer);
         payload.write(buffer);
     }
+    
+    public int length() {
+        return Header.LENGTH + payload.length();
+    }
 
     public ByteBuffer toBuffer() {
-        int total = Header.LENGTH + payload.length();
-        ByteBuffer buffer = ByteBuffer.allocate(total);
-        writeToBuffer(buffer);
+        ByteBuffer buffer = ByteBuffer.allocate(length());
+        write(buffer);
         return buffer;
     }
 

@@ -6,12 +6,16 @@ public class EmptyMessage implements Payload {
 
     public static final EmptyMessage INSTANCE = new EmptyMessage();
 
-    public static final PayloadParser PARSER = new PayloadParser() {
+    private static final PayloadParser PARSER = new PayloadParser() {
         @Override
         public Payload parse(ByteBuffer buffer) {
             return new EmptyMessage();
         }
     };
+    
+    public static PayloadParser getParser() { 
+        return PARSER;
+    }
 
     @Override
     public int length() {

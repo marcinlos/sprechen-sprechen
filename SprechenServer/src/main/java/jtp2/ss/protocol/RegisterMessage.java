@@ -14,17 +14,21 @@ public class RegisterMessage implements Payload {
         this.passwordHash = passwordHash;
     }
 
-    public static final PayloadParser PARSER = new PayloadParser() {
+    private static final PayloadParser PARSER = new PayloadParser() {
         @Override
         public Payload parse(ByteBuffer buffer) {
             long hash = buffer.getLong();
             int length = buffer.getInt();
             byte[] loginBytes = new byte[length];
-            buffer.get(loginBytes, 0, length);
+            buffer.get(loginBytes);
             String login = Utils.decode(loginBytes);
             return new RegisterMessage(login, hash);
         }
     };
+    
+    public static PayloadParser getParser() {
+        return PARSER;
+    }
 
     public String getLogin() {
         return login;
@@ -42,9 +46,9 @@ public class RegisterMessage implements Payload {
     @Override
     public void write(ByteBuffer buffer) {
         buffer.putLong(passwordHash);
-        byte[] content = Utils.encode(login);
-        buffer.putInt(content.length);
-        buffer.put(content);
+        byte[] loginBytes = Utils.encode(login);
+        buffer.putInt(loginBytes.length);
+        buffer.put(loginBytes);
     }
 
     @Override

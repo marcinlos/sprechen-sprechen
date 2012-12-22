@@ -4,6 +4,6 @@ import java.nio.ByteBuffer;
 
 public interface PayloadParser {
 
-    Payload parse(ByteBuffer buffer);
+    Payload parse(ByteBuffer buffer) throws InvalidFormatException;
 
 }

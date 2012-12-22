@@ -7,37 +7,36 @@ import java.nio.ByteBuffer;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LoginMessageTest {
+public class StatusMessageTest {
 
-    private LoginMessage message;
+    private StatusMessage message;
     private int actualLength;
     
     @Before
     public void setUp() throws Exception {
-        String login = "user5";
-        String desc = "Some desc";
-        message = new LoginMessage(login, 1234321, Status.AVAILABLE, desc);
-        actualLength = LoginMessage.FIXED_PART_LENGTH + 
-                Utils.encodedSize(login) + Utils.encodedSize(desc);
+        String name = "user77";
+        String desc = "Some fancy description";
+        message = new StatusMessage(name, Status.AVAILABLE, desc);
+        actualLength = StatusMessage.FIXED_PART_LENGTH + 
+                Utils.encodedSize(name)+ Utils.encodedSize(desc);
     }
-    
+
     @Test
     public void testLength() {
         int length = message.length();
         assertEquals(actualLength, length);
     }
-
+    
     @Test
     public void testDecoding() throws InvalidFormatException {
         ByteBuffer buffer = ByteBuffer.allocate(actualLength);
         message.write(buffer);
         buffer.flip();
         
-        LoginMessage decoded = 
-                (LoginMessage) LoginMessage.getParser().parse(buffer);
-        assertEquals(message.getPasswordHash(), decoded.getPasswordHash());
-        assertEquals(message.getLogin(), decoded.getLogin());
-        assertEquals(message.getInitialStatus(), decoded.getInitialStatus());
+        StatusMessage decoded = 
+                (StatusMessage) StatusMessage.getParser().parse(buffer);
+        assertEquals(message.getStatus(), decoded.getStatus());
+        assertEquals(message.getUsername(), decoded.getUsername());
         assertEquals(message.getDescription(), decoded.getDescription());
     }
 
