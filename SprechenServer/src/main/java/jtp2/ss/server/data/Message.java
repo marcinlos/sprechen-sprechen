@@ -4,23 +4,22 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 
 
 @Entity
 public class Message {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private long id;
 
-    @OneToOne
-    private User source;
+    //@OneToOne
+    @Column
+    private String sender;
 
-    @OneToOne
-    private User destination;
+    //@OneToOne
+    @Column
+    private String recipient;
 
     @Column
     private String content;
@@ -28,28 +27,28 @@ public class Message {
     @Column
     private Date date;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public User getSource() {
-        return source;
+    public String getSender() {
+        return sender;
     }
 
-    public void setSource(User source) {
-        this.source = source;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
-    public User getDestination() {
-        return destination;
+    public String getRecipient() {
+        return recipient;
     }
 
-    public void setDestination(User destination) {
-        this.destination = destination;
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
     }
 
     public String getContent() {

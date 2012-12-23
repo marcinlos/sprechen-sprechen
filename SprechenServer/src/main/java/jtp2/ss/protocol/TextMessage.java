@@ -5,15 +5,17 @@ import java.util.Date;
 
 public class TextMessage implements Message {
     
+    private long identifier;
     private String sender;
     private String recipient;
     private String content;
     private Date date;
     
-    public static final int FIXED_PART_LENGTH = 8 + 4 + 4 + 4;
+    public static final int FIXED_PART_LENGTH = 8 + 8 + 4 + 4 + 4;
     
-    public TextMessage(String sender, String recipient, String content,
-            Date date) {
+    public TextMessage(long identifier, String sender, String recipient, 
+            String content, Date date) {
+        this.identifier = identifier;
         this.sender = sender;
         this.recipient = recipient;
         this.content = content;
@@ -23,6 +25,7 @@ public class TextMessage implements Message {
     private static final PayloadParser PARSER = new PayloadParser() {
         @Override
         public Message parse(ByteBuffer buffer) {
+            long id = buffer.getLong();
             long timestamp = buffer.getLong();
             Date date = new Date(timestamp);
             int senderSize = buffer.getInt();
@@ -37,14 +40,30 @@ public class TextMessage implements Message {
             String sender = Utils.decode(senderBytes);
             String recipient = Utils.decode(recipientBytes);
             String content = Utils.decode(contentBytes);
-            return new TextMessage(sender, recipient, content, date);
+            return new TextMessage(id, sender, recipient, content, date);
         }
     };
     
     public static PayloadParser getParser() {
         return PARSER;
     }
+    
+    public long getId() {
+        return identifier;
+    }
+    
+    public void setId(long id) {
+        this.identifier = id;
+    }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    
     public String getSender() {
         return sender;
     }
@@ -53,11 +72,11 @@ public class TextMessage implements Message {
         this.sender = sender;
     }
 
-    public String getReceipient() {
+    public String getRecipient() {
         return recipient;
     }
 
-    public void setReceipient(String recipient) {
+    public void setRecipient(String recipient) {
         this.recipient = recipient;
     }
 
@@ -67,14 +86,6 @@ public class TextMessage implements Message {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     @Override
@@ -89,13 +100,14 @@ public class TextMessage implements Message {
     public void write(ByteBuffer buffer) {
         /*
          * Format:
-         * | timestamp | sender_size | rec_size | text_size |
+         * | id | timestamp | sender_size | rec_size | text_size |
          * | sender ... | recipient | text ... |
          */
         long timestamp = date.getTime();
         byte[] senderBytes = Utils.encode(sender);
         byte[] recipientBytes = Utils.encode(recipient);
         byte[] contentBytes = Utils.encode(content);
+        buffer.putLong(identifier);
         buffer.putLong(timestamp);
         buffer.putInt(senderBytes.length);
         buffer.putInt(recipientBytes.length);
@@ -108,6 +120,7 @@ public class TextMessage implements Message {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Id: ").append(identifier).append("\n");
         sb.append("From: ").append(sender).append("\n");
         sb.append("To: ").append(recipient).append("\n");
         sb.append(content);

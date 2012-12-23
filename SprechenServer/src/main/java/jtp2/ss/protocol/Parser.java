@@ -20,6 +20,7 @@ public class Parser {
         parsers.put(Type.NOTIFY_STATUS, StatusMessage.getParser());
         parsers.put(Type.GET_STATUS, StringMessage.getParser());
         parsers.put(Type.SEND_MSG, TextMessage.getParser());
+        parsers.put(Type.SEND_ACK, AckMessage.getParser());
         parsers.put(Type.RECV_MSG, TextMessage.getParser());
     }
 

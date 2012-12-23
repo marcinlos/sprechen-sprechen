@@ -5,7 +5,8 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
-import jtp2.ss.protocol.DataUnit;
+import jtp2.ss.protocol.PDU;
+import jtp2.ss.protocol.ReceiveStatus;
 import jtp2.ss.protocol.Status;
 import jtp2.ss.server.core.MessageConnection;
 import jtp2.ss.server.data.Message;
@@ -73,8 +74,9 @@ public class Session {
         }
 
         @Override
-        public void sendToOtherUser(Message message) {
-            server.sendMessage(login, message);
+        public ReceiveStatus sendToOtherUser(Message message)
+                throws NoSuchUserException {
+            return server.sendMessage(message);
         }
 
         @Override
@@ -83,18 +85,8 @@ public class Session {
         }
 
         @Override
-        public void sendBack(DataUnit message) {
+        public void sendBack(PDU message) {
             connection.sendMessage(message);
-        }
-
-        @Override
-        public void error(String message, Throwable exc) {
-            logger.error(message, exc);
-        }
-
-        @Override
-        public void error(String message) {
-            logger.error(message);
         }
 
     }

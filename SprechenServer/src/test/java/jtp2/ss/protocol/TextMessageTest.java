@@ -19,7 +19,7 @@ public class TextMessageTest {
         String recipient = "user x666";
         String content = "Some content of a message, whatevah";
         Date date = new Date(1234567890);
-        message = new TextMessage(sender, recipient, content, date);
+        message = new TextMessage(1111, sender, recipient, content, date);
         
         int senderSize = Utils.encodedSize(sender);
         int recipientSize = Utils.encodedSize(recipient);
@@ -42,8 +42,9 @@ public class TextMessageTest {
         
         TextMessage decoded = 
                 (TextMessage) TextMessage.getParser().parse(buffer);
+        assertEquals(message.getId(), decoded.getId());
         assertEquals(message.getSender(), decoded.getSender());
-        assertEquals(message.getReceipient(), decoded.getReceipient());
+        assertEquals(message.getRecipient(), decoded.getRecipient());
         assertEquals(message.getDate(), decoded.getDate());
         assertEquals(message.getContent(), decoded.getContent());
     }

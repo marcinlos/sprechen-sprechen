@@ -4,10 +4,12 @@ import java.util.List;
 
 import jtp2.ss.server.data.Message;
 import jtp2.ss.server.data.User;
+import jtp2.ss.server.protocol.NoSuchUserException;
+import jtp2.ss.server.protocol.UserAlreadyExistsException;
 
 public interface PersistenceManager {
 
-    void register(User user);
+    void register(User user) throws UserAlreadyExistsException;
 
     void delete(User user);
 
@@ -15,6 +17,6 @@ public interface PersistenceManager {
 
     List<Message> getPendingMessages(String login);
 
-    void addMessage(Message message);
+    void addMessage(Message message) throws NoSuchUserException;
     
 }

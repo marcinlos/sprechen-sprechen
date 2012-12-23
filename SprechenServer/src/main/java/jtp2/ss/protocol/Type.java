@@ -10,6 +10,7 @@ public enum Type {
     LOGOUT, 
     NEW_STATUS,
     SEND_MSG,
+    SEND_ACK,
     RECV_MSG,
     GET_STATUS,
     NOTIFY_STATUS;

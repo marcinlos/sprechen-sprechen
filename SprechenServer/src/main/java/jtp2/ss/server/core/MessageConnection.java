@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
-import jtp2.ss.protocol.DataUnit;
+import jtp2.ss.protocol.PDU;
 import jtp2.ss.protocol.Header;
 import jtp2.ss.protocol.InvalidFormatException;
 import jtp2.ss.protocol.MessageRecipient;
@@ -34,7 +34,7 @@ public class MessageConnection {
         connection.close();
     }
 
-    public void sendMessage(DataUnit message) {
+    public void sendMessage(PDU message) {
         ByteBuffer buffer = message.toBuffer();
         buffer.flip();
         connection.write(buffer, null, adaptedFailureHandler);
@@ -93,7 +93,7 @@ public class MessageConnection {
                     connection.read(buffer, null, this);
                 } else {
                     buffer.flip();
-                    DataUnit message = DataUnit.fromBytes(buffer);
+                    PDU message = PDU.fromBytes(buffer);
                     protocol.sendMessage(message);
                     readNext();
                 }

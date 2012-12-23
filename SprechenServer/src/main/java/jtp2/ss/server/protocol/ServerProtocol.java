@@ -2,11 +2,13 @@ package jtp2.ss.server.protocol;
 
 import java.util.Collection;
 
-import jtp2.ss.protocol.DataUnit;
+import jtp2.ss.protocol.AckMessage;
+import jtp2.ss.protocol.PDU;
 import jtp2.ss.protocol.EmptyMessage;
 import jtp2.ss.protocol.LoginMessage;
 import jtp2.ss.protocol.Message;
 import jtp2.ss.protocol.MessageRecipient;
+import jtp2.ss.protocol.ReceiveStatus;
 import jtp2.ss.protocol.RegisterMessage;
 import jtp2.ss.protocol.Status;
 import jtp2.ss.protocol.StatusMessage;
@@ -40,28 +42,33 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
     
     private void sendLoginFailed(String message) {
         Message msg = new StringMessage(message);
-        DataUnit pdu = new DataUnit(Type.LOGIN_FAIL, msg);
+        PDU pdu = new PDU(Type.LOGIN_FAIL, msg);
         context.sendBack(pdu);
     }
     
     private void sendLoginOk() {
-        DataUnit pdu = new DataUnit(Type.LOGIN_OK, EmptyMessage.INSTANCE);
+        PDU pdu = new PDU(Type.LOGIN_OK, EmptyMessage.INSTANCE);
         context.sendBack(pdu);
     }
     
     private void sendRegisterFailed(String message) {
         Message msg = new StringMessage(message);
-        DataUnit pdu = new DataUnit(Type.REGISTER_FAIL, msg);
+        PDU pdu = new PDU(Type.REGISTER_FAIL, msg);
         context.sendBack(pdu);
     }
     
     private void sendRegisterOk() {
-        DataUnit pdu = new DataUnit(Type.REGISTER_OK, EmptyMessage.INSTANCE);
+        PDU pdu = new PDU(Type.REGISTER_OK, EmptyMessage.INSTANCE);
+        context.sendBack(pdu);
+    }
+    
+    private void sendAck(long id, ReceiveStatus status) {
+        PDU pdu = new PDU(Type.SEND_ACK, new AckMessage(status, id));
         context.sendBack(pdu);
     }
 
     @Override
-    public void sendMessage(DataUnit message) {
+    public void sendMessage(PDU message) {
         if (state == State.NOT_LOGGED) {
             whenNotLogged(message);
         } else if (state == State.LOGGED) {
@@ -69,7 +76,7 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
         }
     }
     
-    private void whenNotLogged(DataUnit message) {
+    private void whenNotLogged(PDU message) {
         if (message.getType() == Type.LOGIN) {
             LoginMessage msg = (LoginMessage) message.getPayload();
             handleLogin(msg);
@@ -82,7 +89,7 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
         }
     }
     
-    private void whenLogged(DataUnit message) {
+    private void whenLogged(PDU message) {
         if (message.getType() == Type.NEW_STATUS) {
             StatusMessage msg = (StatusMessage) message.getPayload();
             handleStatusChange(msg);
@@ -90,15 +97,28 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
             TextMessage msg = (TextMessage) message.getPayload();
             handleTextMessage(msg);
         } else {
-            context.error("Invalid message " + message.getType() + 
+            logger.error("Invalid message " + message.getType() + 
                     " after login");
         }
     }
     
     private void handleTextMessage(TextMessage msg) {
         if (msg.getSender().equals(login)) {
+            try {
+                jtp2.ss.server.data.Message message = 
+                        new jtp2.ss.server.data.Message();
+                message.setId(msg.getId());
+                message.setSender(msg.getSender());
+                message.setRecipient(msg.getRecipient());
+                message.setContent(msg.getContent());
+                message.setDate(msg.getDate());
+                ReceiveStatus status = context.sendToOtherUser(message);
+                sendAck(message.getId(), status);
+            } catch (NoSuchUserException e) {
+                sendAck(msg.getId(), ReceiveStatus.NO_SUCH_USER);
+            }
         } else {
-            context.error("Invalid message from '" + login + "' - sent with " +
+            logger.error("Invalid message from '" + login + "' - sent with " +
                     "login '" + msg.getSender() + "'");
         }
     }
@@ -107,7 +127,7 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
         if (msg.getLogin().equals(login)) {
             context.changeStatus(msg.getStatus(), msg.getDescription());
         } else {
-            context.error("Invalid message from '" + login + "' - sent with " +
+            logger.error("Invalid message from '" + login + "' - sent with " +
                     "login '" + msg.getLogin() + "'");
         }
     }
@@ -125,11 +145,11 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
                 goTo(State.LOGGED);
                 sendLoginOk();
             } else {
-                context.error("Authentication failure for user '" + login + "'");
+                logger.error("Authentication failure for user '" + login + "'");
                 sendLoginFailed("Authentication failure");
             }
         } catch (UserAlreadyLoggedException e) {
-            context.error("Login error", e);
+            logger.error("Login error", e);
             sendLoginFailed("User already logged in");
         } catch (NoSuchUserException e) {
             sendLoginFailed("User does not exist");
@@ -146,6 +166,7 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
             context.registerUser(user);
             context.loginUser(login);
             this.login = login;
+            goTo(State.LOGGED);
             sendRegisterOk();
             sendPendingMessages();
         } catch (UserAlreadyExistsException e) {
@@ -166,17 +187,17 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
 
     @Override
     public void sendMessage(jtp2.ss.server.data.Message message) {
-        User sender = message.getSource();
-        TextMessage msg = new TextMessage(sender.getLogin(), login, 
+        String sender = message.getSender();
+        TextMessage msg = new TextMessage(message.getId(), sender, login, 
                 message.getContent(), message.getDate());
-        context.sendBack(new DataUnit(Type.RECV_MSG, msg));
+        context.sendBack(new PDU(Type.RECV_MSG, msg));
     }
 
     @Override
     public void notifyStatusChange(String login, Status status,
             String description) {
         StatusMessage msg = new StatusMessage(login, status, description);
-        context.sendBack(new DataUnit(Type.NOTIFY_STATUS, msg));
+        context.sendBack(new PDU(Type.NOTIFY_STATUS, msg));
     }
 
 }

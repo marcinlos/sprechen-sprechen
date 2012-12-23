@@ -26,6 +26,10 @@ public class IOManager {
         return channel;
     }
     
+    public void shutdown() {
+        workers.shutdown();
+    }
+    
     public void waitForShutdown() throws InterruptedException {
         workers.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
     }

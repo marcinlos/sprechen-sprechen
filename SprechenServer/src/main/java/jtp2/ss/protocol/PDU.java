@@ -2,21 +2,21 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
-public class DataUnit {
+public class PDU {
 
     private Header header;
     private Message payload;
 
-    public DataUnit(Type type, Message payload) {
+    public PDU(Type type, Message payload) {
         this.header = new Header(type, payload.length());
         this.payload = payload;
     }
 
-    public static DataUnit fromBytes(ByteBuffer buffer)
+    public static PDU fromBytes(ByteBuffer buffer)
             throws InvalidFormatException {
         Header header = Header.fromBytes(buffer);
         Message payload = Parser.parseMessage(header.getType(), buffer);
-        DataUnit data = new DataUnit(header.getType(), payload);
+        PDU data = new PDU(header.getType(), payload);
         return data;
     }
 
