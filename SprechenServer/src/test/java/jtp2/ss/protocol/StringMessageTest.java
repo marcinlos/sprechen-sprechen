@@ -14,7 +14,7 @@ public class StringMessageTest {
 
     @Before
     public void setUp() throws Exception {
-        String msg = "Some message";
+        String msg = "Some message zażółcić gęślą jaźń";
         message = new StringMessage(msg);
         actualLength = StringMessage.FIXED_PART_LENGTH + 
                 Utils.encodedSize(msg);

@@ -1,5 +1,6 @@
 package jtp2.ss.server.core;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
@@ -8,16 +9,15 @@ import jtp2.ss.protocol.Header;
 import jtp2.ss.protocol.InvalidFormatException;
 import jtp2.ss.protocol.MessageRecipient;
 
-public class UserConnection {
+public class MessageConnection {
 
-    // private String login;
     private Connection connection;
     private MessageRecipient protocol;
     private MessageReader reader;
     private FailureHandler failureHandler;
     private CompletionHandler<Integer, Void> adaptedFailureHandler;
 
-    public UserConnection(Connection connection, MessageRecipient protocol,
+    public MessageConnection(Connection connection, MessageRecipient protocol,
             FailureHandler handler) {
         this.connection = connection;
         this.protocol = protocol;
@@ -28,6 +28,10 @@ public class UserConnection {
 
     public void beginCommunication() {
         reader.readNext();
+    }
+    
+    public void close() throws IOException {
+        connection.close();
     }
 
     public void sendMessage(DataUnit message) {

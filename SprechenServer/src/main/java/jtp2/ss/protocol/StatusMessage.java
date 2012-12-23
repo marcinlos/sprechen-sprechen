@@ -4,14 +4,14 @@ import java.nio.ByteBuffer;
 
 public class StatusMessage implements Message {
 
-    private String username;
+    private String login;
     private Status status;
     private String description;
     
     public static final int FIXED_PART_LENGTH = 1 + 4 + 4;
     
-    public StatusMessage(String username, Status status, String description) {
-        this.username = username;
+    public StatusMessage(String login, Status status, String description) {
+        this.login = login;
         this.status = status;
         this.description = description;
     }
@@ -36,12 +36,12 @@ public class StatusMessage implements Message {
         return PARSER;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLogin() {
+        return login;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public Status getStatus() {
@@ -62,7 +62,7 @@ public class StatusMessage implements Message {
 
     @Override
     public int length() {
-        return FIXED_PART_LENGTH + Utils.encodedSize(username) + 
+        return FIXED_PART_LENGTH + Utils.encodedSize(login) + 
                 Utils.encodedSize(description);
     }
 
@@ -70,7 +70,7 @@ public class StatusMessage implements Message {
     public void write(ByteBuffer buffer) {
         buffer.put(Status.toByte(status));
         byte[] descBytes = Utils.encode(description);
-        byte[] nameBytes = Utils.encode(username);
+        byte[] nameBytes = Utils.encode(login);
         buffer.putInt(nameBytes.length);
         buffer.putInt(descBytes.length);
         buffer.put(nameBytes);

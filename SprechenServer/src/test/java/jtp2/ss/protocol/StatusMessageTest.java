@@ -36,7 +36,7 @@ public class StatusMessageTest {
         StatusMessage decoded = 
                 (StatusMessage) StatusMessage.getParser().parse(buffer);
         assertEquals(message.getStatus(), decoded.getStatus());
-        assertEquals(message.getUsername(), decoded.getUsername());
+        assertEquals(message.getLogin(), decoded.getLogin());
         assertEquals(message.getDescription(), decoded.getDescription());
     }
 

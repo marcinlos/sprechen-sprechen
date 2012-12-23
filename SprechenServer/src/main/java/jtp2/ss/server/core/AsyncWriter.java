@@ -2,6 +2,7 @@ package jtp2.ss.server.core;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -14,20 +15,44 @@ public class AsyncWriter {
     private Lock mutex = new ReentrantLock();
     private Queue<WriteTask<?>> writeQueue = new ArrayDeque<>();
     private WriteTask<?> current;
+    private boolean open = true;
 
     
     public AsyncWriter(AsynchronousSocketChannel channel) {
         this.channel = channel;
     }
     
+    public void close() {
+        mutex.lock();
+        try {
+            open = false;
+        } finally {
+            mutex.unlock();
+        }
+    }
+    
+    public synchronized boolean isOpen() {
+        mutex.lock();
+        try {
+            return open;
+        } finally {
+            mutex.unlock();
+        }
+    }
+    
     public <A> void asyncWrite(ByteBuffer buffer, A attachment, 
             CompletionHandler<Integer, A> handler) {
         mutex.lock();
         try {
-            WriteTask<A> task = new WriteTask<>(buffer, attachment, handler);
-            writeQueue.add(task);
-            if (current == null) {
-                runNext();
+            if (isOpen()) {
+                WriteTask<A> task = new WriteTask<>(buffer, attachment, handler);
+                writeQueue.add(task);
+                if (current == null) {
+                    runNext();
+                }
+            } else if (handler != null) {
+                Throwable exc = new ClosedChannelException();
+                handler.failed(exc, attachment);
             }
         } finally {
             mutex.unlock();
@@ -69,7 +94,12 @@ public class AsyncWriter {
         public void completed(Integer bytes, A attachment) {
             remaining -= bytes;
             if (remaining > 0) {
-                writeSome();
+                if (isOpen()) {
+                    writeSome();
+                } else if (handler != null) {
+                    Throwable exc = new ClosedChannelException();
+                    handler.failed(exc, attachment);
+                }
             } else {
                 runNext();
                 if (handler != null) {

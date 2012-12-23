@@ -13,6 +13,9 @@ public class User {
 
     @Column
     private long passwordHash;    
+    
+    @Column
+    private String description;
 
     public String getLogin() {
         return login;
@@ -28,6 +31,14 @@ public class User {
 
     public void setPasswordHash(long passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
     
 

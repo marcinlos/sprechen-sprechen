@@ -2,21 +2,36 @@ package jtp2.ss.server.core;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 
 
 public class AsyncReader {
     
     private AsynchronousSocketChannel channel;
+    private boolean open = true;
     
     public AsyncReader(AsynchronousSocketChannel channel) {
         this.channel = channel;
     }
     
+    public synchronized void close() {
+        open = false;
+    }
+    
+    public synchronized boolean isOpen() {
+        return open;
+    }
+    
     public <A> void asyncRead(ByteBuffer buffer, A attachment,
             CompletionHandler<Integer, A> handler) {
-        ReadAction<A> reader = new ReadAction<A>(buffer, attachment, handler);
-        reader.readSome();
+        if (isOpen()) {
+            ReadAction<A> reader = new ReadAction<>(buffer, attachment, handler);
+            reader.readSome();
+        } else if (handler != null) {
+            Throwable exc = new ClosedChannelException();
+            handler.failed(exc, attachment);
+        }
     }
     
     private class ReadAction<A> implements CompletionHandler<Integer, A> {
@@ -25,6 +40,7 @@ public class AsyncReader {
         private int remaining;
         private A attachment;
         private CompletionHandler<Integer, A> handler;
+
         
         public ReadAction(ByteBuffer buffer, A attachment,
                 CompletionHandler<Integer, A> handler) {
@@ -38,11 +54,14 @@ public class AsyncReader {
         public void completed(Integer bytes, A attachment) {
             remaining -= bytes;
             if (remaining > 0) {
-                readSome();
-            } else {
-                if (handler != null) {
-                    handler.completed(bytes, attachment);
+                if (isOpen()) {
+                    readSome();
+                } else if (handler != null) {
+                    Throwable exc = new ClosedChannelException();
+                    handler.failed(exc, attachment);
                 }
+            } else if (handler != null) {
+                handler.completed(bytes, attachment);
             }
         }
     
