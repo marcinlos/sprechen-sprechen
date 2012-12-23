@@ -36,6 +36,10 @@ public class DataUnit {
     public int length() {
         return Header.LENGTH + payload.length();
     }
+    
+    public Type getType() {
+        return header.getType();
+    }
 
     public ByteBuffer toBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(length());

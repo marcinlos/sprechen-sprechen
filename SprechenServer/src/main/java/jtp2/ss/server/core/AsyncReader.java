@@ -13,16 +13,10 @@ public class AsyncReader {
         this.channel = channel;
     }
     
-    public <A> void asyncRead(ByteBuffer buffer, int bytes, A attachment,
-            CompletionHandler<Integer, A> handler) {
-        ReadAction<A> reader = new ReadAction<A>(buffer, bytes, 
-                attachment, handler);
-        reader.readSome();
-    }
-    
     public <A> void asyncRead(ByteBuffer buffer, A attachment,
             CompletionHandler<Integer, A> handler) {
-        asyncRead(buffer, buffer.remaining(), attachment, handler);
+        ReadAction<A> reader = new ReadAction<A>(buffer, attachment, handler);
+        reader.readSome();
     }
     
     private class ReadAction<A> implements CompletionHandler<Integer, A> {
@@ -32,10 +26,10 @@ public class AsyncReader {
         private A attachment;
         private CompletionHandler<Integer, A> handler;
         
-        public ReadAction(ByteBuffer buffer, int bytes, A attachment,
+        public ReadAction(ByteBuffer buffer, A attachment,
                 CompletionHandler<Integer, A> handler) {
             this.buffer = buffer;
-            this.remaining = bytes;
+            this.remaining = buffer.remaining();
             this.attachment = attachment;
             this.handler = handler;
         }
@@ -45,8 +39,10 @@ public class AsyncReader {
             remaining -= bytes;
             if (remaining > 0) {
                 readSome();
-            } else if (handler != null) {
-                handler.completed(bytes, attachment);
+            } else {
+                if (handler != null) {
+                    handler.completed(bytes, attachment);
+                }
             }
         }
     

@@ -104,5 +104,14 @@ public class TextMessage implements Message {
         buffer.put(recipientBytes);
         buffer.put(contentBytes);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("From: ").append(sender).append("\n");
+        sb.append("To: ").append(recipient).append("\n");
+        sb.append(content);
+        return sb.toString();
+    }
 
 }

@@ -14,11 +14,6 @@ public class AsyncConnection implements Connection {
         this.writer = new AsyncWriter(channel);
     }
     
-    public <A> void read(ByteBuffer buffer, int bytes, A attachment,
-            CompletionHandler<Integer, A> handler) {
-        reader.asyncRead(buffer, attachment, handler);
-    }
-    
     public <A> void read(ByteBuffer buffer, A attachment,
             CompletionHandler<Integer, A> handler) {
         reader.asyncRead(buffer, attachment, handler);

@@ -5,9 +5,6 @@ import java.nio.channels.CompletionHandler;
 
 public interface Connection {
 
-    <A> void read(ByteBuffer buffer, int bytes, A attachment,
-            CompletionHandler<Integer, A> handler);
-    
     <A> void read(ByteBuffer buffer, A attachment,
             CompletionHandler<Integer, A> handler);
     

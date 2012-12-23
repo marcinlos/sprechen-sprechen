@@ -72,13 +72,17 @@ public class AsyncWriter {
                 writeSome();
             } else {
                 runNext();
-                handler.completed(bytes, attachment);
+                if (handler != null) {
+                    handler.completed(bytes, attachment);
+                }
             }
         }
     
         @Override
         public void failed(Throwable e, A attachment) {
-            handler.failed(e, attachment);
+            if (handler != null) {
+                handler.failed(e, attachment);
+            } // else swallow :(
         }
     }
 
