@@ -68,7 +68,7 @@ public class ServerProtocol implements MessageRecipient, ProtocolInterface {
     }
 
     @Override
-    public void sendMessage(PDU message) {
+    public void gotMessage(PDU message) {
         if (state == State.NOT_LOGGED) {
             whenNotLogged(message);
         } else if (state == State.LOGGED) {

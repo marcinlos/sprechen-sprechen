@@ -2,6 +2,7 @@ package jtp2.ss.protocol;
 
 import java.nio.ByteBuffer;
 
+
 public class AckMessage implements Message {
 
     private ReceiveStatus status;

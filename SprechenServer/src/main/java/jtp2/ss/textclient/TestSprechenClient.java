@@ -58,7 +58,7 @@ public class TestSprechenClient implements MessageRecipient, FailureHandler {
     }
 
     @Override
-    public void sendMessage(PDU message) {
+    public void gotMessage(PDU message) {
         System.out.println("Response:");
         System.out.println(message);
     }
